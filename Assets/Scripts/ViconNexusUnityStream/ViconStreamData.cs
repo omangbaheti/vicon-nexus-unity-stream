@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace ubco.ovilab.ViconUnityStream
 {
     [Serializable]
-    public class Data
+    public class ViconStreamData
     {
         public Dictionary<string, List<float>> data;
         public Dictionary<string, List<string>> hierachy;

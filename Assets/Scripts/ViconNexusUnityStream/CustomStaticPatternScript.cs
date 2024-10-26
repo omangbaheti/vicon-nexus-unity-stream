@@ -58,7 +58,7 @@ namespace ubco.ovilab.ViconUnityStream
         }
 
         /// <inheritdoc />
-        protected override Dictionary<string, Vector3> ProcessSegments(Dictionary<string, Vector3> segments, Data data)
+        protected override Dictionary<string, Vector3> ProcessSegments(Dictionary<string, Vector3> segments, ViconStreamData viconStreamData)
         {
             Vector3 forward;
             Vector3 right;

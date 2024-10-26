@@ -77,7 +77,7 @@ namespace ubco.ovilab.ViconUnityStream
         private StreamWriter rawWriter;
         private string rawData;
 
-        private Data defaultDataObj;
+        private ViconStreamData _defaultViconStreamDataObj;
 
         private List<string> invalidMarkers = new List<string>();
         private List<float> k_curr, k_prev;
@@ -106,7 +106,7 @@ namespace ubco.ovilab.ViconUnityStream
         {
             subjectDataManager.RegisterSubject(subjectName);
         }
-        
+
         /// <inheritdoc />
         protected virtual void OnDisable()
         {
@@ -118,16 +118,16 @@ namespace ubco.ovilab.ViconUnityStream
         {
             if (subjectDataManager.UseDefaultData)
             {
-                if (defaultDataObj == null)
+                if (_defaultViconStreamDataObj == null)
                 {
-                    defaultDataObj = JsonConvert.DeserializeObject<Data>(defaultData);
+                    _defaultViconStreamDataObj = JsonConvert.DeserializeObject<ViconStreamData>(defaultData);
                 }
-                ProcessData(defaultDataObj, defaultData);
+                ProcessData(_defaultViconStreamDataObj, defaultData);
             }
             else
             {
                 // TODO: move all of this to SubjectDataManager
-                if (subjectDataManager.StreamedData.TryGetValue(subjectName, out Data subjectDataObj) && subjectDataObj != null &&
+                if (subjectDataManager.StreamedData.TryGetValue(subjectName, out ViconStreamData subjectDataObj) && subjectDataObj != null &&
                     subjectDataManager.StreamedRawData.TryGetValue(subjectName, out string subjectRawData) && subjectRawData != null)
                 {
                     ProcessData(subjectDataObj, subjectRawData);
@@ -160,17 +160,17 @@ namespace ubco.ovilab.ViconUnityStream
 
             string filePath;
 
-            filePath = GetPath("input"); 
+            filePath = GetPath("input");
             inputWriter = new StreamWriter(filePath, true);
             filePaths.Add(filePath);
             Debug.Log("Writing to:  " + filePath);
 
-            filePath = GetPath("final"); 
+            filePath = GetPath("final");
             finalWriter = new StreamWriter(filePath, true);
             filePaths.Add(filePath);
             Debug.Log("Writing to:  " + filePath);
 
-            filePath = GetPath("raw"); 
+            filePath = GetPath("raw");
             rawWriter = new StreamWriter(filePath, true);
             filePaths.Add(filePath);
             Debug.Log("Writing to:  " + filePath);
@@ -185,9 +185,9 @@ namespace ubco.ovilab.ViconUnityStream
         {
             if (!subjectDataManager.EnableWriteData || subjectDataManager.UseDefaultData)
                 return;
-            
+
             var currentTicks = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            
+
             inputWriter.WriteLine(currentTicks + ", " + "{" + string.Join(",", segments.Select(kvp => "[" +kvp.Key + ", " + kvp.Value.ToString("F6") + "]")) + "}");
             inputWriter.Flush();
 
@@ -207,10 +207,10 @@ namespace ubco.ovilab.ViconUnityStream
         }
         #endregion
 
-        void ProcessData(Data data, string text)
+        void ProcessData(ViconStreamData viconStreamData, string text)
         {
             rawData = text;
-	
+
             int zeroMarkers = 0;
 
             foreach (KeyValuePair<string, List<string>> segment in segmentMarkers)
@@ -222,7 +222,7 @@ namespace ubco.ovilab.ViconUnityStream
 
                 foreach (string marker in segment.Value)
                 {
-                    var _data = data.data[marker];
+                    var _data = viconStreamData.data[marker];
 
                     /// Need to run gap fillling stratergy
                     if (_data[0] == 0)
@@ -254,7 +254,7 @@ namespace ubco.ovilab.ViconUnityStream
                     {
                         SetPreviousData(marker, _data);
                     }
-                    data.data[marker] = _data;
+                    viconStreamData.data[marker] = _data;
                 }
 
                 if (gapFillingStrategy == GapFillingStrategy.FillRelative && !dataValid && segment.Value.Count > 1)
@@ -297,7 +297,7 @@ namespace ubco.ovilab.ViconUnityStream
                             previousData[t_marker].Last.Value[2] = t_current_vector.y;
 
                             /// Set that to the current data object
-                            data.data[t_marker] = GetPreviousData(t_marker);
+                            viconStreamData.data[t_marker] = GetPreviousData(t_marker);
                         }
                         dataValid = true; /// Data is now valid
                     }
@@ -307,7 +307,7 @@ namespace ubco.ovilab.ViconUnityStream
                 {
                     foreach (string marker in segment.Value)
                     {
-                        List<float> _pos = data.data[marker];
+                        List<float> _pos = viconStreamData.data[marker];
                         pos += ListToVector(_pos);
                         //break;
                         if (_pos.Count > 3)
@@ -340,7 +340,7 @@ namespace ubco.ovilab.ViconUnityStream
                 HideSubject();
             }
 
-            segments = ProcessSegments(segments, data);
+            segments = ProcessSegments(segments, viconStreamData);
 
             if (driveSkeleton)
             {
@@ -413,12 +413,18 @@ namespace ubco.ovilab.ViconUnityStream
             _previousData.AddLast(value);
         }
 
-        /// <summary>
-        /// Executes after computing the segment positions based on the marker data.
-        /// This method can be extended to do additional processing on the segment data.
-        /// Also provides the data recieved for this frame.
-        /// </summary>
-        protected abstract Dictionary<string, Vector3> ProcessSegments(Dictionary<string, Vector3> segments, Data data);
+        private void CommitPreviousData()
+        {
+            foreach (LinkedList<List<float>> _previousData in previousData.Values)
+            {
+                if (_previousData.Count > previousDataQueueLimit)
+                {
+                    _previousData.RemoveFirst();
+                }
+            }
+        }
+
+        protected abstract Dictionary<string, Vector3> ProcessSegments(Dictionary<string, Vector3> segments, ViconStreamData viconStreamData);
 
         /// <summary>
         /// Recursively assign the transform pose starting from the BoneName passed in.

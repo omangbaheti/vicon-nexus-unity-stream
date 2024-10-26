@@ -25,6 +25,18 @@ namespace ubco.ovilab.ViconUnityStream
         private List<XRHandJointRadius> xrHandJointRadiiList = new();
 
         public float normalOffset = 0.001f;
+
+        [Range(0, 0.002f)]
+        [SerializeField] public float indexNormalOffset = 0.001f;
+        [Range(0, 0.002f)]
+        [SerializeField] public float middleNormalOffset = 0.0018f;
+        [Range(0, 0.002f)]
+        [SerializeField] public float ringNormalOffset = 0.0013f;
+        [Range(0, 0.002f)]
+        [SerializeField] public float littleNormalOffset = 0.0012f;
+        [Range(0, 0.0002f)]
+        [SerializeField] public float thumbNormalOffset = 0.00009f;
+
         public bool setPosition = true;
         public bool setScale = true;
         public float scaleToSet = 0.02f;
@@ -65,7 +77,7 @@ namespace ubco.ovilab.ViconUnityStream
         protected string marker_FA1 = "FA1";
         protected string marker_WRA = "WRA";
         protected string marker_WRB = "WRB";
-    
+
         // thumb markers
         protected string marker_TH1 = "TH1";
         protected string marker_TH2 = "TH2";
@@ -178,15 +190,15 @@ namespace ubco.ovilab.ViconUnityStream
                 {segment_1D1, segment_1D2},
                 {segment_1D2, segment_1D3},
                 {segment_1D3, segment_1D4},
-        
+
                 {segment_2D1, segment_2D2},
                 {segment_2D2, segment_2D3},
                 {segment_2D3, segment_2D4},
-        
+
                 {segment_3D1, segment_3D2},
                 {segment_3D2, segment_3D3},
                 {segment_3D3, segment_3D4},
-        
+
                 {segment_4D1, segment_4D2},
                 {segment_4D2, segment_4D3},
                 {segment_4D3, segment_4D4},
@@ -211,13 +223,13 @@ namespace ubco.ovilab.ViconUnityStream
                 {segment_3D2, segment_3D1},
                 {segment_4D2, segment_4D1},
                 {segment_5D2, segment_5D1},
-        
+
                 {segment_1D3, segment_1D2},
                 {segment_2D3, segment_2D2},
                 {segment_3D3, segment_3D2},
                 {segment_4D3, segment_4D2},
                 {segment_5D3, segment_5D2},
-        
+
                 {segment_1D4, segment_1D3},
                 {segment_2D4, segment_2D3},
                 {segment_3D4, segment_3D3},
@@ -227,29 +239,29 @@ namespace ubco.ovilab.ViconUnityStream
 
             segmentMarkers = new Dictionary<string, List<string>>() {
                 { segment_Arm, new List<string>() {marker_FA2, marker_FA1}} ,//{ marker_WRB, marker_FA2, marker_FA1, marker_WRA } } ,
-                {    segment_Hand, new List<string>() { marker_WRB, marker_WRA }} ,//{"RH1", marker_H3, "RH6"}}, 
+                {    segment_Hand, new List<string>() { marker_WRB, marker_WRA }} ,//{"RH1", marker_H3, "RH6"}},
                 {    segment_1D1,  new List<string>(){marker_TH1}},
                 {    segment_1D2, new List<string>(){marker_TH2}},
                 {    segment_1D3, new List<string>(){marker_TH3, marker_TH3P}},
                 {    segment_1D4, new List<string>{marker_TH4}},
 
                 {    segment_2D1, new List<string>{marker_H2}},
-                {    segment_2D2, new List<string>{marker_IF1}}, 
+                {    segment_2D2, new List<string>{marker_IF1}},
                 {    segment_2D3, new List<string>{marker_IF2}},
-                {    segment_2D4, new List<string>{marker_IF3}}, 
-        
+                {    segment_2D4, new List<string>{marker_IF3}},
+
                 {    segment_3D1, new List<string>{marker_H3}},
                 {    segment_3D2, new List<string>{marker_TF1}},
                 {    segment_3D3, new List<string>{marker_TF2}},
                 {    segment_3D4, new List<string>{marker_TF3}},
-        
+
                 {    segment_4D1, new List<string>{marker_H4}},
                 {    segment_4D2, new List<string>{marker_RF2}},
                 {    segment_4D3, new List<string>{marker_RF3}},
                 {    segment_4D4, new List<string>{marker_RF4}},
-        
-                {   segment_5D1, new List<string>(){marker_H5}}, 
-                {    segment_5D2,  new List<string>(){marker_PF1}}, 
+
+                {   segment_5D1, new List<string>(){marker_H5}},
+                {    segment_5D2,  new List<string>(){marker_PF1}},
                 {    segment_5D3, new List<string>(){marker_PF2}},
                 {    segment_5D4, new List<string>(){marker_PF3}}
             };
@@ -333,8 +345,8 @@ namespace ubco.ovilab.ViconUnityStream
             return handedness == Handedness.Right;
         }
 
-        /// <inheritdoc />
-        protected override Dictionary<string, Vector3> ProcessSegments(Dictionary<string, Vector3> segments, Data data)
+
+        protected override Dictionary<string, Vector3> ProcessSegments(Dictionary<string, Vector3> segments, ViconStreamData viconStreamData)
         {
             /// Filling any gaps that can be filled
             if (gapFillingStrategy == GapFillingStrategy.FillRelative)
@@ -382,10 +394,10 @@ namespace ubco.ovilab.ViconUnityStream
             }
 
             // Debug.Log(data.data[marker_TH3P] + "  -  "+ data.data[marker_TH3]);
-            if (data.data.ContainsKey(marker_TH3P) && data.data.ContainsKey(marker_TH3))
+            if (viconStreamData.data.ContainsKey(marker_TH3P) && viconStreamData.data.ContainsKey(marker_TH3))
             {
-                var p1 = data.data[marker_TH3P];
-                var p2 = data.data[marker_TH3];
+                var p1 = viconStreamData.data[marker_TH3P];
+                var p2 = viconStreamData.data[marker_TH3];
                 Vector3 p1Position = new Vector3(p1[0], p1[2], p1[1]);
                 Vector3 p2Position = new Vector3(p2[0], p2[2], p2[1]);
 
@@ -431,7 +443,7 @@ namespace ubco.ovilab.ViconUnityStream
         }
 
         private Matrix4x4 handWorldToLocalMatrix;
-    
+
         protected override string ConstructFinalWriterString()
         {
             return "[" + base.ConstructFinalWriterString() + ", [" +
@@ -601,15 +613,15 @@ namespace ubco.ovilab.ViconUnityStream
                         if (setPosition)
                         {
                             if (fingerId == finger_1)
-                                Bone.position += Bone.forward * normalOffset * 0.9f;
+                                Bone.position += Bone.forward * thumbNormalOffset;
                             else if (fingerId == finger_3)
-                                Bone.position += Bone.forward * normalOffset * 1.08f;
+                                Bone.position += Bone.forward * middleNormalOffset;
                             else if (fingerId == finger_4)
-                                Bone.position += Bone.forward * normalOffset * 1.13f;
+                                Bone.position += Bone.forward * ringNormalOffset;
                             else if (fingerId == finger_5)
-                                Bone.position += Bone.forward * normalOffset * 1.2f;
+                                Bone.position += Bone.forward * littleNormalOffset;
                             else
-                                Bone.position += Bone.forward * normalOffset;
+                                Bone.position += Bone.forward * indexNormalOffset;
                         }
 
                         if (segmentToJointMapping.ContainsKey(BoneName))
@@ -627,6 +639,8 @@ namespace ubco.ovilab.ViconUnityStream
             if (Bone.name == segment_Hand)
                 handWorldToLocalMatrix = Bone.worldToLocalMatrix;
         }
+
+
 
         /// <inheritdoc />
         protected override void FindAndTransform(Transform iTransform, string BoneName)
