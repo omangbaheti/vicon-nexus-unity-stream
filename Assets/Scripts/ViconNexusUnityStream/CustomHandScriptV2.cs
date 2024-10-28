@@ -369,10 +369,10 @@ namespace ubco.ovilab.ViconUnityStream
             }
 
             // Debug.Log(data.data[marker_TH3P] + "  -  "+ data.data[marker_TH3]);
-            if (viconStreamData.data.ContainsKey(marker_TH3P) && viconStreamData.data.ContainsKey(marker_TH3))
+            if (viconStreamData.markerPose.ContainsKey(marker_TH3P) && viconStreamData.markerPose.ContainsKey(marker_TH3))
             {
-                var p1 = viconStreamData.data[marker_TH3P];
-                var p2 = viconStreamData.data[marker_TH3];
+                var p1 = viconStreamData.markerPose[marker_TH3P];
+                var p2 = viconStreamData.markerPose[marker_TH3];
                 Vector3 p1Position = new Vector3(p1[0], p1[2], p1[1]);
                 Vector3 p2Position = new Vector3(p2[0], p2[2], p2[1]);
 

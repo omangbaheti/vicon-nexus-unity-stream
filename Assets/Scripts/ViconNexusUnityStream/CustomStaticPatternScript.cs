@@ -47,7 +47,7 @@ namespace ubco.ovilab.ViconUnityStream
             {
                 if (segmentMarkers == null)
                 {
-                    segmentMarkers = new();
+                    segmentMarkers = new Dictionary<string, List<string>>();
                 }
                 segmentMarkers.Clear();
                 foreach (SegmentMarkerPattern pattern in patterns)

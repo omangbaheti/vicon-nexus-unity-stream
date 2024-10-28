@@ -22,7 +22,7 @@ namespace ubco.ovilab.ViconUnityStream
 
         [SerializeField]
         [Tooltip("The radius of each joint to be reported by the xr hands. Joints not in this list will not report radius.")]
-        private List<XRHandJointRadius> xrHandJointRadiiList = new();
+        private List<XRHandJointRadius> xrHandJointRadiiList = new List<XRHandJointRadius>();
 
         public float normalOffset = 0.001f;
 
@@ -394,10 +394,10 @@ namespace ubco.ovilab.ViconUnityStream
             }
 
             // Debug.Log(data.data[marker_TH3P] + "  -  "+ data.data[marker_TH3]);
-            if (viconStreamData.data.ContainsKey(marker_TH3P) && viconStreamData.data.ContainsKey(marker_TH3))
+            if (viconStreamData.markerPose.ContainsKey(marker_TH3P) && viconStreamData.markerPose.ContainsKey(marker_TH3))
             {
-                var p1 = viconStreamData.data[marker_TH3P];
-                var p2 = viconStreamData.data[marker_TH3];
+                var p1 = viconStreamData.markerPose[marker_TH3P];
+                var p2 = viconStreamData.markerPose[marker_TH3];
                 Vector3 p1Position = new Vector3(p1[0], p1[2], p1[1]);
                 Vector3 p2Position = new Vector3(p2[0], p2[2], p2[1]);
 
@@ -459,6 +459,7 @@ namespace ubco.ovilab.ViconUnityStream
         /// </summary>
         private Vector3 FillWithRelativeAdjacent(string boneName, Dictionary<string, Vector3> _segments)
         {
+            
             if (gapFillingStrategy != GapFillingStrategy.FillRelative)
             {
                 return Vector3.zero;
@@ -686,7 +687,7 @@ namespace ubco.ovilab.ViconUnityStream
             {
                 if (xrHandJointRadiiList == null)
                 {
-                    xrHandJointRadiiList = new();
+                    xrHandJointRadiiList = new List<XRHandJointRadius>();
                 }
 
                 for (int i = XRHandJointIDUtility.ToIndex(XRHandJointID.BeginMarker); i < XRHandJointIDUtility.ToIndex(XRHandJointID.EndMarker); ++i)

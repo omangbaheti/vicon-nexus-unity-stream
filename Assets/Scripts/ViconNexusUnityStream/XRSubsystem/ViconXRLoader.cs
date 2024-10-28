@@ -9,8 +9,8 @@ namespace ubco.ovilab.ViconUnityStream
 {
     public class ViconXRLoader: ScriptableObject
     {
-        static List<XRInputSubsystemDescriptor> inputSubsystemDescriptors = new();
-        static List<XRHandSubsystemDescriptor> xrHandsSubsystemDescriptors = new();
+        static List<XRInputSubsystemDescriptor> inputSubsystemDescriptors = new List<XRInputSubsystemDescriptor>();
+        static List<XRHandSubsystemDescriptor> xrHandsSubsystemDescriptors = new List<XRHandSubsystemDescriptor>();
 
         private ViconXRSettings settings;
         private static ViconXRLoader loader;
