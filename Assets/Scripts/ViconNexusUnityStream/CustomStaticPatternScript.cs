@@ -100,7 +100,7 @@ namespace ubco.ovilab.ViconUnityStream
                     return segments;
                 }
             }
-            
+
             Quaternion rot = Quaternion.LookRotation(forward, up);
             foreach(string segmentName in segments.Keys)
             {

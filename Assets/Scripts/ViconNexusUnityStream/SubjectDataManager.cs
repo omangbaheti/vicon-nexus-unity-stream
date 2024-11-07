@@ -133,7 +133,7 @@ public class SubjectDataManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Disable connection 
+    /// Disable connection
     /// </summary>
     private async void MaybeDisableConnection()
     {

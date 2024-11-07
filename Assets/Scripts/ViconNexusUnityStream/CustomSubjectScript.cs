@@ -55,7 +55,7 @@ namespace ubco.ovilab.ViconUnityStream
         /// </summary>
         public List<string> filePaths { get; protected set; }
         #endregion
-    
+
         #region Data processing related private vars
         protected float viconUnitsToUnityUnits = 0.001f;  // This into vicon units = unity units
 
@@ -222,7 +222,7 @@ namespace ubco.ovilab.ViconUnityStream
 
                 foreach (string marker in segment.Value)
                 {
-                    var _data = viconStreamData.markerPose[marker];
+                    List<float> _data = viconStreamData.data[marker];
 
                     /// Need to run gap fillling stratergy
                     if (_data[0] == 0)
@@ -254,14 +254,14 @@ namespace ubco.ovilab.ViconUnityStream
                     {
                         SetPreviousData(marker, _data);
                     }
-                    viconStreamData.markerPose[marker] = _data;
+                    viconStreamData.data[marker] = _data;
                 }
 
                 if (dataValid)
                 {
                     foreach (string marker in segment.Value)
                     {
-                        List<float> _pos = viconStreamData.markerPose[marker];
+                        List<float> _pos = viconStreamData.data[marker];
                         pos += ListToVector(_pos);
                         //break;
                         if (_pos.Count > 3)
