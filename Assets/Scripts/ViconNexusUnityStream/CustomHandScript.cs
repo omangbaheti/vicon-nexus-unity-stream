@@ -26,18 +26,23 @@ namespace ubco.ovilab.ViconUnityStream
         [Tooltip("The radius of each joint to be reported by the xr hands. Joints not in this list will not report radius.")]
         private List<XRHandJointRadius> xrHandJointRadiiList = new();
 
-        public float baseNormalOffset = 0.001f;
+        public Vector2 baseNormalOffset = Vector2.one * 0.01f;
 
-        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")] [Range(-100, 100)]
-        [SerializeField] public float indexNormalOffset = 0f;
-        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")] [Range(-100, 100)]
-        [SerializeField] public float middleNormalOffset = 0f;
-        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")] [Range(-100, 100)]
-        [SerializeField] public float ringNormalOffset = 0f;
-        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")] [Range(-100, 100)]
-        [SerializeField] public float littleNormalOffset = 0f;
-        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")] [Range(-100, 100)]
-        [SerializeField] public float thumbNormalOffset = 0f;
+        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")]
+        [Range(-100, 200)][SerializeField] public float indexNormalOffset = 0;
+        [Range(-100, 200)][SerializeField] public float indexTangentialOffset = -100;
+        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")]
+        [Range(-100, 200)][SerializeField] public float middleNormalOffset = 0;
+        [Range(-100, 200)][SerializeField] public float middleTangentialOffset = -100;
+        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")]
+        [Range(-100, 200)][SerializeField] public float ringNormalOffset = 0;
+        [Range(-100, 200)][SerializeField] public float ringTangentialOffset = -100;
+        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")]
+        [Range(-100, 200)][SerializeField] public float littleNormalOffset = 0;
+        [Range(-100, 200)][SerializeField] public float littleTangentialOffset = -100;
+        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")]
+        [Range(-100, 200)] [SerializeField] public float thumbNormalOffset = 0;
+        [Range(-100, 200)][SerializeField] public float thumbTangentialOffset = -100;
 
         public bool setPosition = true;
         public bool setScale = true;
@@ -608,15 +613,31 @@ namespace ubco.ovilab.ViconUnityStream
                         if (setPosition)
                         {
                             if (fingerId == finger_1)
-                                Bone.position += Bone.forward * (baseNormalOffset * (1 + thumbNormalOffset * 0.01f));
+                            {
+                                Bone.position += Bone.forward * (baseNormalOffset.x * (1 + thumbNormalOffset * 0.01f));
+                                Bone.position += Bone.right * (baseNormalOffset.y * (1 + thumbTangentialOffset * 0.01f));
+                            }
                             else if (fingerId == finger_3)
-                                Bone.position += Bone.forward * (baseNormalOffset * (1 + middleNormalOffset * 0.01f));
+                            {
+                                Bone.position += Bone.forward * (baseNormalOffset.x * (1 + middleNormalOffset * 0.01f));
+                                Bone.position += Bone.right * (baseNormalOffset.y * (1 + middleTangentialOffset * 0.01f));
+                            }
                             else if (fingerId == finger_4)
-                                Bone.position += Bone.forward * (baseNormalOffset * (1 + ringNormalOffset * 0.01f));
+                            {
+                                Bone.position += Bone.forward * (baseNormalOffset.x * (1 + ringNormalOffset * 0.01f));
+                                Bone.position += Bone.right * (baseNormalOffset.y * (1 + ringTangentialOffset * 0.01f));
+                            }
                             else if (fingerId == finger_5)
-                                Bone.position += Bone.forward * (baseNormalOffset * (1 + littleNormalOffset * 0.01f));
+                            {
+                                Bone.position += Bone.forward * (baseNormalOffset.x * (1 + littleNormalOffset * 0.01f));
+                                Bone.position += Bone.right * (baseNormalOffset.y * (1 + littleTangentialOffset * 0.01f));
+                            }
                             else
-                                Bone.position += Bone.forward * (baseNormalOffset * (1 + indexNormalOffset * 0.01f));
+                            {
+                                Bone.position += Bone.forward * (baseNormalOffset.x * (1 + indexNormalOffset * 0.01f));
+                                Bone.position += Bone.right * (baseNormalOffset.y * (1 + indexTangentialOffset* 0.01f));
+                            }
+
                         }
 
                         if (segmentToJointMapping.ContainsKey(BoneName))
