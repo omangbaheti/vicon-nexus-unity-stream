@@ -12,9 +12,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 105894e3f052447a9ac26a82866a42cd, type: 3}
   m_Name: DefaultHandProperties
   m_EditorClassIdentifier: 
-  baseNormalOffset: 0.001
-  indexNormalOffset: 0
-  middleNormalOffset: 0
-  ringNormalOffset: 0
-  littleNormalOffset: 0
-  thumbNormalOffset: 0
+  baseNormalOffset: 0.01
+  baseTangentialOffset: 0.01
+  indexNormalOffset: -100
+  middleNormalOffset: -100
+  ringNormalOffset: -100
+  littleNormalOffset: -100
+  thumbNormalOffset: -100
+  indexTangentialOffset: 0
+  middleTangentialOffset: 0
+  ringTangentialOffset: 0
+  littleTangentialOffset: 0
+  thumbTangentialOffset: 0
+  jointNormalOffsetRatio:
+    m_Items:
+    - Key: Proximal
+      Value: 1
+    - Key: Intermediate
+      Value: 0.66
+    - Key: Distal
+      Value: 0.2
+    - Key: Tip
+      Value: 0
+  jointTangetialOffsetRatios:
+    m_Items:
+    - Key: Proximal
+      Value: 1
+    - Key: Intermediate
+      Value: 1
+    - Key: Distal
+      Value: 1
+    - Key: Tip
+      Value: 1
