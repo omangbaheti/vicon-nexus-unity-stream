@@ -9,34 +9,34 @@ namespace ubco.ovilab.ViconUnityStream.Utils
     {
         [Tooltip("Base normal offset in unity units to place hand from marker positions")]
         [SerializeField] private float baseNormalOffset = 0.01f;
-        
+
         [Tooltip("Base normal offset in unity units to place hand from marker positions")]
         [SerializeField] private float baseTangentialOffset = 0.01f;
-    
-        
-        
-        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")] [Range(-100, 100)]
+
+
+
+        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")] [Range(-200, 100)]
         [SerializeField] private float indexNormalOffset = 0f;
-        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")] [Range(-100, 100)]
+        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")] [Range(-200, 100)]
         [SerializeField] private float middleNormalOffset = 0f;
-        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")] [Range(-100, 100)]
+        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")] [Range(-200, 100)]
         [SerializeField] private float ringNormalOffset = 0f;
-        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")] [Range(-100, 100)]
+        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")] [Range(-200, 100)]
         [SerializeField] private float littleNormalOffset = 0f;
-        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")] [Range(-100, 100)]
+        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")] [Range(-200, 100)]
         [SerializeField] private float thumbNormalOffset = 0f;
-        
-        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")] [Range(-100, 100)]
+
+        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")] [Range(-200, 100)]
         [SerializeField] private float indexTangentialOffset = 0f;
-        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")] [Range(-100, 100)]
+        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")] [Range(-200, 100)]
         [SerializeField] private float middleTangentialOffset = 0f;
-        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")] [Range(-100, 100)]
+        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")] [Range(-200, 100)]
         [SerializeField] private float ringTangentialOffset = 0f;
-        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")] [Range(-100, 100)]
+        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")] [Range(-200, 100)]
         [SerializeField] private float littleTangentialOffset = 0f;
-        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")] [Range(-100, 100)]
+        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")] [Range(-200, 100)]
         [SerializeField] private float thumbTangentialOffset = 0f;
-        
+
         [Tooltip("The ratio in which its applied to each joint")]
         [SerializeField] private SerializableDictionary<string, float> jointNormalOffsetRatio = new()
         {
@@ -45,7 +45,36 @@ namespace ubco.ovilab.ViconUnityStream.Utils
             {"Distal", 1f},
             {"Tip", 1f},
         };
-        
+
+        [Tooltip("The ratio in which its applied to each joint")]
+        private SerializableDictionary<string, float> JointInvertedNormalRatios
+        {
+            get
+            {
+                return new()
+                {
+                    { "Proximal", jointNormalOffsetRatio["Distal"] },
+                    { "Intermediate", jointNormalOffsetRatio["Intermediate"] },
+                    { "Distal", jointNormalOffsetRatio["Proximal"] },
+                    { "Tip", jointNormalOffsetRatio["Tip"] }
+                };
+            }
+        }
+
+
+        private SerializableDictionary<string, float> JointInvertedTangentialRatios
+        {
+            get
+            {
+                return new()
+                {
+                    { "Proximal", jointTangetialOffsetRatios["Distal"] },
+                    { "Intermediate", jointTangetialOffsetRatios["Intermediate"] },
+                    { "Distal", jointTangetialOffsetRatios["Proximal"] },
+                    { "Tip", jointTangetialOffsetRatios["Tip"] }
+                };
+            }
+        }
         [Tooltip("The ratio in which its applied to each joint")]
         [SerializeField] private SerializableDictionary<string, float> jointTangetialOffsetRatios = new()
         {
@@ -54,17 +83,80 @@ namespace ubco.ovilab.ViconUnityStream.Utils
             {"Distal", 1f},
             {"Tip", 1f},
         };
-        
-        public Dictionary<string, float> JointNormalOffsetRatios
+
+        public float JointNormalOffsetRatios(string fingerID, string joint)
         {
-            get => jointNormalOffsetRatio;
+            string _joint = "";
+            switch(joint)
+            {
+                case "R1D1" or "R2D1" or "R3D1" or "R4D1" or "R5D1":
+                    _joint = "Proximal";
+                    break;
+                case "R1D2" or "R2D2" or "R3D2" or "R4D2" or "R5D2":
+                    _joint = "Intermediate";
+                    break;
+                case "R1D3" or "R2D3" or "R3D3" or "R4D3" or "R5D3":
+                    _joint = "Distal";
+                    break;
+                case "R1D4" or "R2D4" or "R3D4" or "R4D4" or "R5D4":
+                    _joint = "Tip";
+                    break;
+            }
+            if (fingerID == "R1")
+            {
+                var offsetDict = jointNormalOffsetRatio;
+                return   (1 + ThumbNormalOffset * 0.01f) * offsetDict[_joint];
+            }
+            else if (fingerID == "R2")
+            {
+                var offsetDict = jointNormalOffsetRatio;
+                return (1 + IndexNormalOffset * 0.01f) * offsetDict[_joint];
+            }
+            else if (fingerID == "R3")
+            {
+                var offsetDict = jointNormalOffsetRatio;
+                return (1 + middleNormalOffset * 0.01f) * offsetDict[_joint];
+            }
+            else if (fingerID == "R4")
+            {
+                var offsetDict = jointNormalOffsetRatio;
+                return (1 + ringNormalOffset * 0.01f) * offsetDict[_joint];
+            }
+            else if(fingerID == "R5")
+            {
+                var offsetDict = jointNormalOffsetRatio;
+                return (1 + littleNormalOffset * 0.01f) * offsetDict[_joint];
+            }
+            else
+            {
+                Debug.LogWarning($"Unknown Finger : {fingerID}");
+                var offsetDict = jointNormalOffsetRatio;
+                return offsetDict[_joint];
+            }
         }
 
-        public Dictionary<string, float> JointTangetialOffsetRatios
+        public float JointTangetialOffsetRatios(string fingerID, string joint)
         {
-            get => jointTangetialOffsetRatios;
+            string _joint = "";
+            switch(joint)
+            {
+                case "R1D1" or "R2D1" or "R3D1" or "R4D1" or "R5D1":
+                    _joint = "Proximal";
+                    break;
+                case "R1D2" or "R2D2" or "R3D2" or "R4D2" or "R5D2":
+                    _joint = "Intermediate";
+                    break;
+                case "R1D3" or "R2D3" or "R3D3" or "R4D3" or "R5D3":
+                    _joint = "Distal";
+                    break;
+                case "R1D4" or "R2D4" or "R3D4" or "R4D4" or "R5D4":
+                    _joint = "Tip";
+                    break;
+            }
+            var offsetDict = thumbTangentialOffset < 0f ? JointInvertedTangentialRatios : jointTangetialOffsetRatios;
+            return offsetDict[_joint];
         }
-        
+
         /// <summary>
         /// Base normal offset in unity units to place hand from marker positions
         /// </summary>
@@ -118,7 +210,7 @@ namespace ubco.ovilab.ViconUnityStream.Utils
             get => littleNormalOffset;
             set => littleNormalOffset = value;
         }
-        
+
         /// <summary>
         /// Base Tangential offset in unity units to place hand from marker positions
         /// </summary>
@@ -172,6 +264,6 @@ namespace ubco.ovilab.ViconUnityStream.Utils
             get => littleTangentialOffset;
             set => littleTangentialOffset = value;
         }
-        
+
     }
 }
