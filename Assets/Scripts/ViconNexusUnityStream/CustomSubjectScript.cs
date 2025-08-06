@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
+using UnityEditor;
 
 namespace ubco.ovilab.ViconUnityStream
 {
@@ -84,6 +85,7 @@ namespace ubco.ovilab.ViconUnityStream
         private bool isWriterSetup;
         #endregion
 
+        Dictionary<string, GameObject> vizGameObjects = new();
         #region Unity methods
         /// <inheritdoc />
         protected virtual void Start()
@@ -200,7 +202,12 @@ namespace ubco.ovilab.ViconUnityStream
 
                 foreach (string marker in segment.Value)
                 {
-                    var _data = viconStreamData.data[marker];
+                    List<float> _data = new();
+                    if (!viconStreamData.data.TryGetValue(marker, out _data))
+                    {
+                        // Debug.LogWarning("Invalid data: " + marker);
+                        continue;
+                    };
 
                     /// Need to run gap fillling stratergy
                     if (_data[0] == 0)
@@ -285,7 +292,14 @@ namespace ubco.ovilab.ViconUnityStream
                 {
                     foreach (string marker in segment.Value)
                     {
-                        List<float> _pos = viconStreamData.data[marker];
+                        List<float> _pos = new();
+                        if (!viconStreamData.data.TryGetValue(marker, out _pos))
+                        {
+                            // Debug.LogWarning("Invalid pos: " + marker);
+                            continue;
+                        };
+
+                        // List<float> _pos = viconStreamData.data[marker];
                         pos += ListToVector(_pos);
                         //break;
                         if (_pos.Count > 3)
@@ -496,6 +510,52 @@ namespace ubco.ovilab.ViconUnityStream
         protected virtual bool TestSegmentsQuality(Dictionary<string, Vector3> segments)
         {
             return true;
+        }
+
+        private void OnDrawGizmos()
+        {
+            // Handles.color = Color.cyan;
+            // Handles.SphereHandleCap(0, transform.position, transform.rotation, 0.1f, EventType.Repaint);
+            //
+            // Vector3 pos = transform.position;
+            // Quaternion rot = transform.rotation;
+            //
+            // // Define direction vectors
+            // Vector3 forward = rot * Vector3.forward;
+            // Vector3 up = rot * Vector3.up;
+            // Vector3 right = rot * Vector3.right;
+            //
+            // float lineLength = 0.3f;
+            //
+            // // Draw forward (blue)
+            // Handles.color = Color.blue;
+            // Handles.DrawLine(pos, pos + forward * lineLength);
+            //
+            // // Draw up (green)
+            // Handles.color = Color.green;
+            // Handles.DrawLine(pos, pos + up * lineLength);
+            //
+            // // Draw right (red)
+            // Handles.color = Color.red;
+            // Handles.DrawLine(pos, pos + right * lineLength);
+
+            Handles.color = Color.green;
+            foreach (KeyValuePair<string, Vector3> segment in segments)
+            {
+                if (!vizGameObjects.ContainsKey(segment.Key))
+                {
+                    GameObject vizGameObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    vizGameObject.transform.SetParent(transform);
+                    vizGameObject.transform.position = segment.Value * viconUnitsToUnityUnits;
+                    vizGameObject.transform.localScale = Vector3.one * 0.05f;
+                    vizGameObjects.Add(segment.Key, vizGameObject);
+                }
+                else
+                {
+                    vizGameObjects[segment.Key].transform.position = segment.Value * viconUnitsToUnityUnits;
+                }
+                // Handles.SphereHandleCap(0, segment.Value * viconUnitsToUnityUnits, Quaternion.identity, 0.05f, EventType.Repaint);
+            }
         }
     }
 

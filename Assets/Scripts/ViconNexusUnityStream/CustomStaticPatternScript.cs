@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using UnityEditor;
 
 namespace ubco.ovilab.ViconUnityStream
 {
@@ -34,6 +35,8 @@ namespace ubco.ovilab.ViconUnityStream
         [Tooltip("The second segment to use to compute the up vector")]
         [SerializeField] private string upSegment2;
 
+        private Dictionary<string, Vector3> segments;
+
         protected override void Start()
         {
             base.Start();
@@ -63,7 +66,7 @@ namespace ubco.ovilab.ViconUnityStream
             Vector3 forward;
             Vector3 right;
             Vector3 up;
-
+            this.segments = segments;
             if (segments.TryGetValue(forwardSegment1, out Vector3 forward1) && segments.TryGetValue(forwardSegment2, out Vector3 forward2))
             {
                 forward = forward2 - forward1;

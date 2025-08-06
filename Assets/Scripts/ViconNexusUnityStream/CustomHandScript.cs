@@ -655,26 +655,7 @@ namespace ubco.ovilab.ViconUnityStream
 
         protected override bool TestSegmentsQuality(Dictionary<string, Vector3> segments)
         {
-            if (segments.ContainsKey(segment_5D3) &&
-                segments.ContainsKey(segment_2D3) &&
-                segments.ContainsKey(segment_5D1) &&
-                segments.ContainsKey(segment_2D1))
-            {
-                float d3_d1_dot = Vector3.Dot(segments[segment_5D3] - segments[segment_2D3], segments[segment_5D1] - segments[segment_2D1]);
-                if (d3_d1_dot > 0)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                // TODO quality check when specific markers are missing
-                return true;
-            }
+            return true;
         }
 
         /// <summary>

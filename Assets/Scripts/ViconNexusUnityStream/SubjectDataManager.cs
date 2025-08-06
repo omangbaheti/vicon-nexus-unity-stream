@@ -163,6 +163,8 @@ namespace ubco.ovilab.ViconUnityStream
         private bool forceWrite;
         private readonly object dataLock = new object();
 
+        private float previousTimeStamp = 0f;
+
         private void Awake()
         {
             dataToWrite = new Dictionary<string, Dictionary<string, ViconStreamData>>();
@@ -465,6 +467,13 @@ namespace ubco.ovilab.ViconUnityStream
         /// </summary>
         private void StreamData(byte[] receivedData)
         {
+            float timeDifference = Time.time - previousTimeStamp;
+            Debug.Log(timeDifference);
+            if (Time.time - previousTimeStamp > 0.05f)
+            {
+                Debug.LogWarning($"Big Delay {timeDifference}");
+            }
+            previousTimeStamp = Time.time;
             JObject jsonObject = JObject.Parse(Encoding.UTF8.GetString(receivedData));
             long currentTicks = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             foreach (string subject in subjectList)
