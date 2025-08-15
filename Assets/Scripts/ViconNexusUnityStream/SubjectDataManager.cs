@@ -173,13 +173,13 @@ namespace ubco.ovilab.ViconUnityStream
         }
 
         /// <summary>
-        /// Sets the path to the recorded data file by generating a unique filename 
+        /// Sets the path to the recorded data file by generating a unique filename
         /// with the current date and time, appending the ".jsonl.txt" extension,
         /// and combining it with the base path. Calling this again will force data being
         /// written to a different file. Returns the file location to which data is written.
         /// The file be in the location will be:
         /// `<see cref="FileSaveLocationBase"/>/<see cref="PathToDataFile"/>/<see cref="FileNameBase"/>_< date > < time >.jsonl.txt`
-        /// 
+        ///
         /// This method needs to invoked after setting the values of
         /// <see cref="FileSaveLocationBase"/>, <see cref="PathToDataFile"/>
         /// or <see cref="FileNameBase"/> for them to take effect.
@@ -468,7 +468,6 @@ namespace ubco.ovilab.ViconUnityStream
         private void StreamData(byte[] receivedData)
         {
             float timeDifference = Time.time - previousTimeStamp;
-            Debug.Log(timeDifference);
             if (Time.time - previousTimeStamp > 0.05f)
             {
                 Debug.LogWarning($"Big Delay {timeDifference}");

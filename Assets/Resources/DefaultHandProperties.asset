@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 105894e3f052447a9ac26a82866a42cd, type: 3}
   m_Name: DefaultHandProperties
   m_EditorClassIdentifier: 
-  baseNormalOffset: 0.0035
-  indexNormalOffset: 100
+  baseNormalOffset: 0
+  indexNormalOffset: -100
   middleNormalOffset: -100
   ringNormalOffset: -100
   littleNormalOffset: -100

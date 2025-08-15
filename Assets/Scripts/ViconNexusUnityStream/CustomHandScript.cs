@@ -60,6 +60,7 @@ namespace ubco.ovilab.ViconUnityStream
         private Vector3 palm;
         private bool noHand;
 
+        public Pose XRIOffset;
         // NOTE: Considered using an enum with a dictionary, but that
         // means using a dictionary lookup everytime a name is needed,
         // so doing it the ugly (or not?) way

@@ -547,7 +547,7 @@ namespace ubco.ovilab.ViconUnityStream
                     GameObject vizGameObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                     vizGameObject.transform.SetParent(transform);
                     vizGameObject.transform.position = segment.Value * viconUnitsToUnityUnits;
-                    vizGameObject.transform.localScale = Vector3.one * 0.05f;
+                    vizGameObject.transform.localScale = Vector3.one * 0.4f;
                     vizGameObjects.Add(segment.Key, vizGameObject);
                 }
                 else

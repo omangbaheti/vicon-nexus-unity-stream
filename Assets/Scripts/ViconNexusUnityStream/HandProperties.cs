@@ -8,15 +8,15 @@ namespace ubco.ovilab.ViconUnityStream.Utils
         [Tooltip("Base normal offset in unity units to place hand from marker positions")]
         [SerializeField] private float baseNormalOffset = 0.001f;
 
-        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")] [Range(-100, 100)]
+        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")] [Range(-200, 100)]
         [SerializeField] private float indexNormalOffset = 0f;
-        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")] [Range(-100, 100)]
+        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")] [Range(-200, 100)]
         [SerializeField] private float middleNormalOffset = 0f;
-        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")] [Range(-100, 100)]
+        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")] [Range(-200, 100)]
         [SerializeField] private float ringNormalOffset = 0f;
-        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")] [Range(-100, 100)]
+        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")] [Range(-200, 100)]
         [SerializeField] private float littleNormalOffset = 0f;
-        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")] [Range(-100, 100)]
+        [Tooltip("Increasing or decreasing the normal offset value by a certain percentage.")] [Range(-200, 100)]
         [SerializeField] private float thumbNormalOffset = 0f;
 
         /// <summary>
