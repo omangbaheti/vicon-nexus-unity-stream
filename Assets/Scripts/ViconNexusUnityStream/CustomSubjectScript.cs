@@ -540,22 +540,22 @@ namespace ubco.ovilab.ViconUnityStream
             // Handles.DrawLine(pos, pos + right * lineLength);
 
             Handles.color = Color.green;
-            foreach (KeyValuePair<string, Vector3> segment in segments)
-            {
-                if (!vizGameObjects.ContainsKey(segment.Key))
-                {
-                    GameObject vizGameObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    vizGameObject.transform.SetParent(transform);
-                    vizGameObject.transform.position = segment.Value * viconUnitsToUnityUnits;
-                    vizGameObject.transform.localScale = Vector3.one * 0.4f;
-                    vizGameObjects.Add(segment.Key, vizGameObject);
-                }
-                else
-                {
-                    vizGameObjects[segment.Key].transform.position = segment.Value * viconUnitsToUnityUnits;
-                }
-                // Handles.SphereHandleCap(0, segment.Value * viconUnitsToUnityUnits, Quaternion.identity, 0.05f, EventType.Repaint);
-            }
+            // foreach (KeyValuePair<string, Vector3> segment in segments)
+            // {
+            //     if (!vizGameObjects.ContainsKey(segment.Key))
+            //     {
+            //         GameObject vizGameObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            //         vizGameObject.transform.SetParent(transform);
+            //         vizGameObject.transform.position = segment.Value * viconUnitsToUnityUnits;
+            //         vizGameObject.transform.localScale = Vector3.one * 0.4f;
+            //         vizGameObjects.Add(segment.Key, vizGameObject);
+            //     }
+            //     else
+            //     {
+            //         vizGameObjects[segment.Key].transform.position = segment.Value * viconUnitsToUnityUnits;
+            //     }
+            //     // Handles.SphereHandleCap(0, segment.Value * viconUnitsToUnityUnits, Quaternion.identity, 0.05f, EventType.Repaint);
+            // }
         }
     }
 

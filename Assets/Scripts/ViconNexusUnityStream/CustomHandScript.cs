@@ -33,10 +33,22 @@ namespace ubco.ovilab.ViconUnityStream
 
         [SerializeField] public Handedness handedness = Handedness.Right;
 
+        [Obsolete("Set position will be deprecated in a future version"), Tooltip("If the hand pose should be set"), SerializeField]
+        private bool setPosition = true;
         [Tooltip("If the hand model should be set to a specific scale"), SerializeField]
         private bool setScale = true;
         [Tooltip("The scale the model should be set to if setScale is enabled"), SerializeField]
         private float scaleToSet = 0.02f;
+
+        /// <summary>
+        /// If the hand pose should be set
+        /// </summary>
+        [Obsolete("Set position will be deprecated in a future version")]
+        public bool SetPosition
+        {
+            get => setPosition;
+            set => setPosition = value;
+        }
 
         /// <summary>
         /// If the hand model should be set to a specific scale
@@ -60,7 +72,6 @@ namespace ubco.ovilab.ViconUnityStream
         private Vector3 palm;
         private bool noHand;
 
-        public Pose XRIOffset;
         // NOTE: Considered using an enum with a dictionary, but that
         // means using a dictionary lookup everytime a name is needed,
         // so doing it the ugly (or not?) way
@@ -136,8 +147,6 @@ namespace ubco.ovilab.ViconUnityStream
         protected override void Start()
         {
             base.Start();
-            Assert.IsNotNull(handProperties, "Hand properties is null.");
-
             string prefix = handedness == Handedness.Right ? "R": "L";
 
             segment_1D1 = prefix + segment_1D1;
@@ -375,7 +384,7 @@ namespace ubco.ovilab.ViconUnityStream
             normal = Vector3.Cross(palm, segments[segment_4D1] - segments[segment_3D1]);
             if (!isRightHand())
             {
-                 normal = -normal;
+                normal = -normal;
             }
 
             if (segmentChild.ContainsKey(segment_1D1) && segments[segmentChild[segment_1D1]] != Vector3.zero && segments[segment_1D1] != Vector3.zero)
@@ -457,11 +466,11 @@ namespace ubco.ovilab.ViconUnityStream
         protected override string ConstructFinalWriterString()
         {
             return "[" + base.ConstructFinalWriterString() + ", [" +
-                handWorldToLocalMatrix[0, 0] + ", " + handWorldToLocalMatrix[0, 1] + ", " + handWorldToLocalMatrix[0, 2] + ", " + handWorldToLocalMatrix[0, 3] + ", " +
-                handWorldToLocalMatrix[1, 0] + ", " + handWorldToLocalMatrix[1, 1] + ", " + handWorldToLocalMatrix[1, 2] + ", " + handWorldToLocalMatrix[1, 3] + ", " +
-                handWorldToLocalMatrix[2, 0] + ", " + handWorldToLocalMatrix[2, 1] + ", " + handWorldToLocalMatrix[2, 2] + ", " + handWorldToLocalMatrix[2, 3] + ", " +
-                handWorldToLocalMatrix[3, 0] + ", " + handWorldToLocalMatrix[3, 1] + ", " + handWorldToLocalMatrix[3, 2] + ", " + handWorldToLocalMatrix[3, 3] + ", " +
-                "]]";
+                   handWorldToLocalMatrix[0, 0] + ", " + handWorldToLocalMatrix[0, 1] + ", " + handWorldToLocalMatrix[0, 2] + ", " + handWorldToLocalMatrix[0, 3] + ", " +
+                   handWorldToLocalMatrix[1, 0] + ", " + handWorldToLocalMatrix[1, 1] + ", " + handWorldToLocalMatrix[1, 2] + ", " + handWorldToLocalMatrix[1, 3] + ", " +
+                   handWorldToLocalMatrix[2, 0] + ", " + handWorldToLocalMatrix[2, 1] + ", " + handWorldToLocalMatrix[2, 2] + ", " + handWorldToLocalMatrix[2, 3] + ", " +
+                   handWorldToLocalMatrix[3, 0] + ", " + handWorldToLocalMatrix[3, 1] + ", " + handWorldToLocalMatrix[3, 2] + ", " + handWorldToLocalMatrix[3, 3] + ", " +
+                   "]]";
         }
 
         /// <summary>
@@ -557,7 +566,7 @@ namespace ubco.ovilab.ViconUnityStream
 
             //if (segmentParents.ContainsKey(BoneName) && segments.ContainsKey(BoneName))
             if (segments.ContainsKey(BoneName))
-            //if (segmentChild.ContainsKey(BoneName) && segments.ContainsKey(BoneName))
+                //if (segmentChild.ContainsKey(BoneName) && segments.ContainsKey(BoneName))
             {
                 Vector3 BonePosition = segments[BoneName];
 
@@ -574,7 +583,10 @@ namespace ubco.ovilab.ViconUnityStream
                     else
                     {
                         string fingerId = BoneName.Substring(0, 2);
-                        Bone.position = BonePosition * viconUnitsToUnityUnits;
+                        if (setPosition)
+                        {
+                            Bone.position = BonePosition * viconUnitsToUnityUnits;
+                        }
                         if (setScale)
                         {
                             Transform p = Bone.parent;
@@ -595,8 +607,9 @@ namespace ubco.ovilab.ViconUnityStream
                                 {
                                     Vector3 right;
                                     Vector3 forward;
-                                    if (fingerId == finger_1 && baseVectors.TryGetValue("R1_right", out right))
+                                    if (fingerId == finger_1)
                                     {
+                                        right = baseVectors["R1_right"];
                                         forward = Vector3.Cross(upDirection, right);
                                     }
                                     else
@@ -616,16 +629,42 @@ namespace ubco.ovilab.ViconUnityStream
                         {
                             // Bone.rotation = Quaternion.identity;
                         }
-                        if (fingerId == finger_1)
-                            Bone.position += Bone.forward * (handProperties.BaseNormalOffset * (1 + handProperties.ThumbNormalOffset * 0.01f));
-                        else if (fingerId == finger_3)
-                            Bone.position += Bone.forward * (handProperties.BaseNormalOffset * (1 + handProperties.MiddleNormalOffset * 0.01f));
-                        else if (fingerId == finger_4)
-                            Bone.position += Bone.forward * (handProperties.BaseNormalOffset * (1 + handProperties.RingNormalOffset * 0.01f));
-                        else if (fingerId == finger_5)
-                            Bone.position += Bone.forward * (handProperties.BaseNormalOffset * (1 + handProperties.LittleNormalOffset * 0.01f));
-                        else
-                            Bone.position += Bone.forward * (handProperties.BaseNormalOffset * (1 + handProperties.IndexNormalOffset * 0.01f));
+                        if (setPosition)
+                        {
+                            if (fingerId == finger_1)
+                            {
+                                Bone.position += Bone.forward * (handProperties.BaseNormalOffset * (1 + handProperties.ThumbNormalOffset * 0.01f));
+                                Bone.position += Bone.right * (handProperties.BaseTangentialOffset * (1 + handProperties.ThumbTangentialOffset * 0.01f));
+                            }
+                            else if (fingerId == finger_3) // Middle
+                            {
+                                Bone.position += Bone.forward * (handProperties.BaseNormalOffset *
+                                                                 (1 + handProperties.MiddleNormalOffset * 0.01f));
+                                Bone.position += Bone.right * (handProperties.BaseTangentialOffset *
+                                                               (1 + handProperties.MiddleTangentialOffset * 0.01f));
+                            }
+                            else if (fingerId == finger_4) // Ring
+                            {
+                                Bone.position += Bone.forward * (handProperties.BaseNormalOffset *
+                                                                 (1 + handProperties.RingNormalOffset * 0.01f));
+                                Bone.position += Bone.right * (handProperties.BaseTangentialOffset *
+                                                               (1 + handProperties.RingTangentialOffset * 0.01f));
+                            }
+                            else if (fingerId == finger_5) // Little
+                            {
+                                Bone.position += Bone.forward * (handProperties.BaseNormalOffset *
+                                                                 (1 + handProperties.LittleNormalOffset * 0.01f));
+                                Bone.position += Bone.right * (handProperties.BaseTangentialOffset *
+                                                               (1 + handProperties.LittleTangentialOffset * 0.01f));
+                            }
+                            else // Index
+                            {
+                                Bone.position += Bone.forward * (handProperties.BaseNormalOffset *
+                                                                 (1 + handProperties.IndexNormalOffset * 0.01f));
+                                Bone.position += Bone.right * (handProperties.BaseTangentialOffset *
+                                                               (1 + handProperties.IndexTangentialOffset * 0.01f));
+                            }
+                        }
 
                         if (segmentToJointMapping.ContainsKey(BoneName))
                         {
@@ -656,7 +695,26 @@ namespace ubco.ovilab.ViconUnityStream
 
         protected override bool TestSegmentsQuality(Dictionary<string, Vector3> segments)
         {
-            return true;
+            if (segments.ContainsKey(segment_5D3) &&
+                segments.ContainsKey(segment_2D3) &&
+                segments.ContainsKey(segment_5D1) &&
+                segments.ContainsKey(segment_2D1))
+            {
+                float d3_d1_dot = Vector3.Dot(segments[segment_5D3] - segments[segment_2D3], segments[segment_5D1] - segments[segment_2D1]);
+                if (d3_d1_dot > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                // TODO quality check when specific markers are missing
+                return true;
+            }
         }
 
         /// <summary>
